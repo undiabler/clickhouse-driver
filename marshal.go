@@ -76,6 +76,23 @@ func unmarshal(value interface{}, data string) (err error) {
 		}
 
 		*v = res
+	case *[]float32:
+		if !isArray(data) {
+			//noinspection GoPlaceholderCount
+			return fmt.Errorf("Column data is not of type []int")
+		}
+		if isEmptyArray(data) {
+			*v = []float32{}
+			return
+		}
+
+		items := splitStringToItems(data)
+		res := make([]float32, len(items))
+		for i := 0; i < len(items); i++ {
+			unmarshal(&res[i], items[i])
+		}
+
+		*v = res
 	case *[]string:
 		if !isArray(data) {
 			//noinspection GoPlaceholderCount
