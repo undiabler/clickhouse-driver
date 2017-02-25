@@ -91,7 +91,11 @@ func unmarshal(value interface{}, data string) (err error) {
 		for i := 0; i < len(items); i++ {
 			var s string
 			unmarshal(&s, items[i])
-			res[i] = string(s[1 : len(s)-1])
+			if len(s) > 1 {
+				res[i] = string(s[1: len(s)-1])
+			} else {
+				res[i] = ""
+			}
 		}
 
 		*v = res
@@ -163,8 +167,8 @@ func marshal(value interface{}) string {
 	case string:
 		return fmt.Sprintf("'%s'", escape(v))
 	case int, int8, int16, int32, int64,
-		uint, uint8, uint16, uint32, uint64,
-		float32, float64:
+	uint, uint8, uint16, uint32, uint64,
+	float32, float64:
 		return fmt.Sprintf("%v", v)
 	}
 	return "''"
