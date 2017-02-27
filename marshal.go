@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"encoding/json"
 )
 
 func escape(s string) string {
@@ -30,6 +31,10 @@ func isEmptyArray(s string) bool {
 
 func splitStringToItems(s string) []string {
 	return strings.Split(string(s[1:len(s)-1]), ",")
+}
+
+func splitStringToItemsArray(s string) []string {
+	return strings.Split(string(s[2:len(s)-2]), "','")
 }
 
 func unmarshal(value interface{}, data string) (err error) {
@@ -116,6 +121,34 @@ func unmarshal(value interface{}, data string) (err error) {
 		}
 
 		*v = res
+	case *[]VisitParamsString:
+		if !isArray(data) {
+			return fmt.Errorf("Column data is not of type Array")
+		}
+
+		if isEmptyArray(data) {
+			*v = []VisitParamsString{}
+			return
+		}
+
+		items := splitStringToItemsArray(data)
+
+		res := make([]VisitParamsString, 0)
+
+		for _, item := range items {
+			buffer := VisitParamsString{}
+
+			err := json.Unmarshal([]byte(unescape(item)), &buffer)
+
+			if err != nil {
+				return fmt.Errorf(err.Error())
+			}
+
+			res = append(res, buffer)
+		}
+
+		*v = res
+
 	case *Array:
 		if !isArray(data) {
 			//noinspection GoPlaceholderCount

@@ -2,8 +2,8 @@ package clickhouse
 
 import (
 	"errors"
-	"fmt"
 	"strings"
+	"fmt"
 )
 
 type (
@@ -12,6 +12,7 @@ type (
 	Row     []interface{}
 	Rows    []Row
 	Array   []interface{}
+	VisitParamsString map[string]interface{}
 )
 
 func NewHttpTransport() HttpTransport {
