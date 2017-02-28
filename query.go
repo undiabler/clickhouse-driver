@@ -38,6 +38,10 @@ func (q Query) Iter(conn *Conn) *Iter {
 	return &Iter{text: resp}
 }
 
+func (r *Iter) Len() int {
+	return len(r.text)
+}
+
 func (q Query) Exec(conn *Conn) (err error) {
 	if conn == nil {
 		return errors.New("Connection pointer is nil")

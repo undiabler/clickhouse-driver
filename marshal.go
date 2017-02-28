@@ -108,7 +108,7 @@ func unmarshal(value interface{}, data string) (err error) {
 			return
 		}
 
-		items := splitStringToItems(data)
+		items := splitStringToItemsArray(data)
 		res := make([]string, len(items))
 		for i := 0; i < len(items); i++ {
 			var s string
