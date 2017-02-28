@@ -114,7 +114,7 @@ func unmarshal(value interface{}, data string) (err error) {
 			var s string
 			unmarshal(&s, items[i])
 			if len(s) > 1 {
-				res[i] = string(s[1: len(s)-1])
+				res[i] = string(s) //string(s[1: len(s)-1])
 			} else {
 				res[i] = ""
 			}

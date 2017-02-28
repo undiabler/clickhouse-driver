@@ -13,6 +13,7 @@ type (
 	Rows    []Row
 	Array   []interface{}
 	VisitParamsString map[string]interface{}
+	StringArray []string
 )
 
 func NewHttpTransport() HttpTransport {
