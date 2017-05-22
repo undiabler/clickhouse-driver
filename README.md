@@ -25,14 +25,17 @@ var (
 for iter.Scan(&name, &date) {
     //
 }
+if iter.Error() != nil {
+    log.Panicln(iter.Error())
+}
 ```
 
 #### Single insert
 ```go
 conn := clickhouse.NewConn("localhost:8123", clickhouse.NewHttpTransport())
 query, err := clickhouse.BuildInsert("clicks",
-    clickhouse.Columns{"name", "date"},
-    clickhouse.Row{"Test name", "2016-01-01 21:01:01"},
+    clickhouse.Columns{"name", "date", "sourceip"},
+    clickhouse.Row{"Test name", "2016-01-01 21:01:01", clickhouse.Func{"IPv4StringToNum", "192.0.2.192"}},
 )
 if err == nil {
     err = query.Exec(conn)
@@ -60,6 +63,9 @@ var (
 for iter.Scan(&num, &name) {
     //
 }
+if iter.Error() != nil {
+    log.Panicln(iter.Error())
+}
 ```
 
 ## Cluster
@@ -81,7 +87,7 @@ conn2 := clickhouse.NewConn("host2", http)
 
 cluster := clickhouse.NewCluster(conn1, conn2)
 cluster.OnCheckError(func (c *clickhouse.Conn) {
-		log.Fatalf("Clickhouse connection failed %s", c.Host)
+    log.Fatalf("Clickhouse connection failed %s", c.Host)
 })
 // Ping connections every second
 go func() {
@@ -90,4 +96,15 @@ go func() {
         time.Sleep(time.Second)
     }
 }()
+```
+
+## Transport options
+
+### Timeout
+
+```go
+t := clickhouse.NewHttpTransport()
+t.Timeout = time.Second * 5
+
+conn := clickhouse.NewConn("host", t)
 ```

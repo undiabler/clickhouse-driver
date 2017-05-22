@@ -213,6 +213,9 @@ func marshal(value interface{}) string {
 		}
 		return "[" + strings.Join(res, ",") + "]"
 	}
+	if t := reflect.TypeOf(value); t.Kind() == reflect.Struct && strings.HasSuffix(t.String(), "Func") {
+		return fmt.Sprintf("%s(%v)", value.(Func).Name, marshal(value.(Func).Args))
+	}
 	switch v := value.(type) {
 	case string:
 		return fmt.Sprintf("'%s'", escape(v))
@@ -220,6 +223,16 @@ func marshal(value interface{}) string {
 	uint, uint8, uint16, uint32, uint64,
 	float32, float64:
 		return fmt.Sprintf("%v", v)
+	//https://clickhouse.yandex/reference_en.html#Boolean values
+	case bool:
+		if value.(bool) {
+			return "1"
+		}
+		return "0"
+	//Convert time to Date type https://clickhouse.yandex/reference_en.html#Date
+	case time.Time:
+		return value.(time.Time).Format("2006-01-02")
 	}
+
 	return "''"
 }

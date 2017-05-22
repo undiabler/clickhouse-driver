@@ -122,6 +122,9 @@ func TestMarshal(t *testing.T) {
 	assert.Equal(t, "10", marshal(int32(10)))
 	assert.Equal(t, "10", marshal(int64(10)))
 
+	assert.Equal(t, "1", marshal(true))
+	assert.Equal(t, "0", marshal(false))
+
 	assert.Equal(t, "3.141592", marshal(float32(3.141592)))
 	assert.Equal(t, "3.1415926535", marshal(float64(3.1415926535)))
 
@@ -135,5 +138,8 @@ func TestMarshal(t *testing.T) {
 	assert.Equal(t, "['k10','20','30val']", marshal([]string{"k10", "20", "30val"}))
 	assert.Equal(t, "['k10','20','30val\\\\']", marshal([]string{"k10", "20", "30val\\"}))
 	assert.Equal(t, "[10,20,30]", marshal([]int{10, 20, 30}))
+	assert.Equal(t, "IPv4StringToNum('192.0.2.128')", marshal(Func{"IPv4StringToNum", "192.0.2.128"}))
+	assert.Equal(t, "IPv4NumToString(3221225985)", marshal(Func{"IPv4NumToString", 3221225985}))
 	assert.Equal(t, "''", marshal(t))
+	assert.Equal(t, "2017-04-10", marshal(time.Date(2017, 04, 10, 0, 0, 0, 0, time.UTC)))
 }
