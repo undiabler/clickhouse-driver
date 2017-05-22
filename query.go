@@ -3,6 +3,7 @@ package clickhouse
 import (
 	"errors"
 	"strings"
+	"net/url"
 )
 
 type External struct {
@@ -20,10 +21,17 @@ type Query struct {
 	Stmt      string
 	args      []interface{}
 	externals []External
+	params url.Values
 }
 
+// Adding external dictionary
 func (q *Query) AddExternal(name string, structure string, data []byte) {
 	q.externals = append(q.externals, External{Name: name, Structure: structure, Data: data})
+}
+
+// Additional parameters like: max_memory_usage, etc.
+func (q Query) AddParam(name string, value string) {
+	q.params.Add(name, value)
 }
 
 func (q Query) Iter(conn *Conn) *Iter {

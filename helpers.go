@@ -4,6 +4,7 @@ import (
 	"errors"
 	"strings"
 	"fmt"
+	"net/url"
 )
 
 type (
@@ -36,6 +37,7 @@ func NewQuery(stmt string, args ...interface{}) Query {
 	return Query{
 		Stmt: stmt,
 		args: args,
+		params:url.Values{},
 	}
 }
 

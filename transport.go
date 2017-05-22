@@ -73,6 +73,12 @@ func prepareExecPostRequest(host string, q Query) (*http.Request, error) {
 			}
 		}
 
+		params := q.params.Encode()
+
+		if len(params) > 0 {
+			query += "&" + params
+		}
+
 		err = writer.Close()
 		if err != nil {
 			return nil, err
