@@ -30,6 +30,7 @@ func NewConn(host string, t Transport) *Conn {
 	return &Conn{
 		Host:      host,
 		transport: t,
+		params: url.Values{},
 	}
 }
 

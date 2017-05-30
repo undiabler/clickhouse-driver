@@ -25,23 +25,39 @@ func (t HttpTransport) Exec(conn *Conn, q Query, readOnly bool) (res string, err
 	var resp *http.Response
 	query := prepareHttp(q.Stmt, q.args)
 	client := &http.Client{Timeout: t.Timeout}
+
 	if readOnly {
 		if len(query) > 0 {
 			query = "?query=" + query
 		}
+
+		params := conn.params.Encode()
+
+		if len(params) > 0 {
+			query += "&" + params
+		}
+
 		resp, err = client.Get(conn.Host + query)
 	} else {
 		var req *http.Request
+
+		// Set global parameters for query, like: user, password, max_memory_limit, etc.
+		// But it skips already defined params.
+		q.MergeParams(conn.params)
+
 		req, err = prepareExecPostRequest(conn.Host, q)
+
 		if err != nil {
 			return "", err
 		}
 
 		resp, err = client.Do(req)
 	}
+
 	if err != nil {
 		return "", err
 	}
+
 	defer resp.Body.Close()
 	buf := new(bytes.Buffer)
 	_, err = buf.ReadFrom(resp.Body)

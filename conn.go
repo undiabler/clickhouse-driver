@@ -3,6 +3,7 @@ package clickhouse
 import (
 	"fmt"
 	"strings"
+	"net/url"
 )
 
 const (
@@ -12,6 +13,7 @@ const (
 type Conn struct {
 	Host      string
 	transport Transport
+	params url.Values
 }
 
 func (c *Conn) Ping() (err error) {
@@ -24,4 +26,12 @@ func (c *Conn) Ping() (err error) {
 	}
 
 	return err
+}
+
+func (c *Conn) SetParams(params url.Values) {
+	c.params = params
+}
+
+func (c *Conn) GetParams() url.Values {
+	return c.params
 }

@@ -34,6 +34,14 @@ func (q Query) AddParam(name string, value string) {
 	q.params.Add(name, value)
 }
 
+func (q Query) MergeParams(params url.Values) {
+	for key, value := range params {
+		if q.params.Get(key) == "" {
+			q.params.Set(key, value[0])
+		}
+	}
+}
+
 func (q Query) Iter(conn *Conn) *Iter {
 	if conn == nil {
 		return &Iter{err: errors.New("Connection pointer is nil")}
