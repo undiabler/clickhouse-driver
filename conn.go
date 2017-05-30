@@ -32,6 +32,10 @@ func (c *Conn) SetParams(params url.Values) {
 	c.params = params
 }
 
+func (c *Conn) AddParam(key string, value string) {
+	c.params.Set(key, value)
+}
+
 func (c *Conn) GetParams() url.Values {
 	return c.params
 }
