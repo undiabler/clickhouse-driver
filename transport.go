@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"strings"
 	"time"
+	"fmt"
 )
 
 const (
@@ -34,8 +35,14 @@ func (t HttpTransport) Exec(conn *Conn, q Query, readOnly bool) (res string, err
 		params := conn.params.Encode()
 
 		if len(params) > 0 {
-			query += "&" + params
+			if len(query) > 0 {
+				query += "&" + params
+			} else {
+				query += "?" + params
+			}
 		}
+
+		fmt.Println(conn.Host + query)
 
 		resp, err = client.Get(conn.Host + query)
 	} else {

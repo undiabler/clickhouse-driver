@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	successTestResponse = "Ok."
+	successTestResponse = "1"
 )
 
 type Conn struct {
@@ -18,7 +18,7 @@ type Conn struct {
 
 func (c *Conn) Ping() (err error) {
 	var res string
-	res, err = c.transport.Exec(c, Query{Stmt: ""}, true)
+	res, err = c.transport.Exec(c, Query{Stmt: "SELECT+1"}, true)
 	if err == nil {
 		if !strings.Contains(res, successTestResponse) {
 			err = fmt.Errorf("Clickhouse host response was '%s', expected '%s'.", res, successTestResponse)
