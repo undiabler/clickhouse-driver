@@ -42,6 +42,33 @@ func NewQuery(stmt string, args ...interface{}) Query {
 	}
 }
 
+func OptimizeTable(table string) Query {
+	return NewQuery("OPTIMIZE TABLE " + table)
+}
+
+func OptimizePartition(table string, partition string) Query {
+	return NewQuery("OPTIMIZE TABLE " + table + " PARTITION " + partition + " FINAL")
+}
+
+func IsLeader(table string, conn *Conn) bool {
+
+	var leader uint8
+
+	query := NewQuery("SELECT is_leader FROM system.replicas WHERE table = '" + table + "'")
+
+	iter := query.Iter(conn)
+
+	if iter.Error() != nil {
+		return false
+	}
+
+	for iter.Scan(&leader) {
+		return leader == 1
+	}
+
+	return false
+}
+
 func BuildInsert(tbl string, cols Columns, row Row) (Query, error) {
 	return BuildMultiInsert(tbl, cols, Rows{row})
 }
