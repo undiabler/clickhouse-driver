@@ -7,7 +7,6 @@ import (
 	"net/url"
 	"strings"
 	"time"
-	"fmt"
 )
 
 const (
