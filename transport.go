@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"strings"
 	"time"
+	"fmt"
 )
 
 const (
@@ -129,10 +130,20 @@ func prepareHttp(stmt string, args []interface{}) string {
 
 	k := 0
 
-	for _, ch := range buf {
-		if ch == '?' && len(args) < k {
+	skip_to := -1
+
+	for key, ch := range buf {
+
+		if skip_to != -1 && key < skip_to {
+			continue
+		} else {
+			skip_to = -1
+		}
+
+		if ch == ':' && stmt[key:key + 7] == ":value:"  {
 			res = append(res, []byte(marshal(args[k]))...)
 			k++
+			skip_to = key + 7
 		} else {
 			res = append(res, ch)
 		}

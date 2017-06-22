@@ -110,7 +110,7 @@ func BuildMultiInsert(tbl string, cols Columns, rows Rows) (Query, error) {
 		}
 	}
 
-	binds := strings.Repeat("?,", colCount)
+	binds := strings.Repeat(":value:,", colCount)
 	binds = "(" + binds[:len(binds)-1] + "),"
 	batch := strings.Repeat(binds, rowCount)
 	batch = batch[:len(batch)-1]
