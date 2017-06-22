@@ -120,12 +120,17 @@ func prepareExecPostRequest(host string, q Query) (*http.Request, error) {
 }
 
 func prepareHttp(stmt string, args []interface{}) string {
+
 	var res []byte
+
 	buf := []byte(stmt)
+
 	res = make([]byte, 0)
+
 	k := 0
+
 	for _, ch := range buf {
-		if ch == '?' {
+		if ch == '?' && len(args) < k {
 			res = append(res, []byte(marshal(args[k]))...)
 			k++
 		} else {
