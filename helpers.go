@@ -54,7 +54,19 @@ func IsLeader(table string, conn *Conn) bool {
 
 	var leader uint8
 
-	query := NewQuery("SELECT is_leader FROM system.replicas WHERE table = '" + table + "'")
+	settings := strings.Split(table, ".")
+
+	database := "default"
+
+	if len(settings) > 1 {
+
+		database = settings[0]
+
+		table = settings[1]
+
+	}
+
+	query := NewQuery("SELECT is_leader FROM system.replicas WHERE database = '" + database + "' table = '" + table + "'")
 
 	iter := query.Iter(conn)
 
