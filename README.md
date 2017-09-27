@@ -57,7 +57,6 @@ queryStr := `INSERT INTO clicks FORMAT TabSeparated
 
 query := clickhouse.NewQuery(queryStr)
 iter := query.Iter(conn)
-query.Exec(conn)
 
 if iter.Error() != nil {
     //
