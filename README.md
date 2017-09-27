@@ -51,9 +51,9 @@ conn.AddParam("user", "{username}")
 conn.AddParam("password", "{password}")
 
 queryStr := `INSERT INTO clicks FORMAT TabSeparated
-1	2017-09-27	2017-09-27 09:08:38	3	10
-2	2017-09-27  2017-09-27 09:08:38	3	11
-3	2017-09-27	2017-09-27 09:08:38	3	12`
+1	2017-09-27	10
+2	2017-09-27	11
+3	2017-09-27	12`
 
 query := clickhouse.NewQuery(queryStr)
 iter := query.Iter(conn)
