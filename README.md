@@ -44,6 +44,26 @@ if err == nil {
 }
 ```
 
+#### Auth and multiple insert
+```go
+conn := clickhouse.NewConn("localhost:8123", clickhouse.NewHttpTransport())
+conn.AddParam("user", "{username}")
+conn.AddParam("password", "{password}")
+
+queryStr := `INSERT INTO clicks FORMAT TabSeparated
+1	2017-09-27	2017-09-27 09:08:38	3	10
+2	2017-09-27  2017-09-27 09:08:38	3	11
+3	2017-09-27	2017-09-27 09:08:38	3	12`
+
+query := clickhouse.NewQuery(queryStr)
+iter := query.Iter(conn)
+query.Exec(conn)
+
+if iter.Error() != nil {
+    //
+}
+```
+
 #### External data for query processing
 
 [See documentation for details](https://clickhouse.yandex/reference_en.html#External%20data%20for%20query%20processing) 
