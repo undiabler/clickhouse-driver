@@ -123,7 +123,10 @@ func prepareExecPostRequest(conn *Conn, q Query) (*http.Request, error) {
 }
 
 func prepareHttp(stmt string, args []interface{}) string {
-
+	if len(args) == 0 {
+		return stmt
+	}
+	
 	var res []byte
 
 	buf := []byte(stmt)
