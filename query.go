@@ -103,6 +103,7 @@ func (q Query) ExecScan(conn *Conn, obj interface{}) (error) {
 		if errUnmarshalObj != nil {
 			return errUnmarshalObj
 		}
+
 	}
 
 	return err
