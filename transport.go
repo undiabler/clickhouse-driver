@@ -47,14 +47,11 @@ func (t HttpTransport) Exec(conn *Conn, q Query, readOnly bool) (res string, err
 
 		// Set global parameters for query, like: user, password, max_memory_limit, etc.
 		// But it skips already defined params.
-		q.MergeParams(conn.params)
-
-		req, err = prepareExecPostRequest(conn.Host, q)
+		req, err = prepareExecPostRequest(conn, q)
 
 		if err != nil {
 			return "", err
 		}
-
 		resp, err = client.Do(req)
 	}
 
@@ -69,7 +66,7 @@ func (t HttpTransport) Exec(conn *Conn, q Query, readOnly bool) (res string, err
 	return buf.String(), err
 }
 
-func prepareExecPostRequest(host string, q Query) (*http.Request, error) {
+func prepareExecPostRequest(conn *Conn, q Query) (*http.Request, error) {
 	query := prepareHttp(q.Stmt, q.args)
 	var req *http.Request
 	var err error = nil
@@ -99,18 +96,24 @@ func prepareExecPostRequest(host string, q Query) (*http.Request, error) {
 			query += "&" + params
 		}
 
+		paramsCon := conn.params.Encode()
+
+		if len(paramsCon) > 0 {
+			query += "&" + paramsCon
+		}
+
 		err = writer.Close()
 		if err != nil {
 			return nil, err
 		}
 
-		req, err = http.NewRequest("POST", host+query, body)
+		req, err = http.NewRequest("POST", conn.Host + query, body)
 		if err != nil {
 			return nil, err
 		}
 		req.Header.Set("Content-Type", writer.FormDataContentType())
 	} else {
-		req, err = http.NewRequest("POST", host, strings.NewReader(query))
+		req, err = http.NewRequest("POST", conn.Host + "?" + conn.params.Encode(), strings.NewReader(query))
 		if err != nil {
 			return nil, err
 		}
@@ -120,7 +123,10 @@ func prepareExecPostRequest(host string, q Query) (*http.Request, error) {
 }
 
 func prepareHttp(stmt string, args []interface{}) string {
-
+	if len(args) == 0 {
+		return stmt
+	}
+	
 	var res []byte
 
 	buf := []byte(stmt)

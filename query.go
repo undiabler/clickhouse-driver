@@ -4,6 +4,7 @@ import (
 	"errors"
 	"strings"
 	"net/url"
+	"encoding/json"
 )
 
 type External struct {
@@ -70,6 +71,39 @@ func (q Query) Exec(conn *Conn) (err error) {
 	resp, err := conn.transport.Exec(conn, q, false)
 	if err == nil {
 		err = errorFromResponse(resp)
+	}
+
+	return err
+}
+
+func (q Query) ExecScan(conn *Conn, obj interface{}) (error) {
+	if conn == nil {
+		return errors.New("Connection pointer is nil")
+	}
+
+	q.Stmt += " FORMAT JSON"
+
+	resp, err := conn.transport.Exec(conn, q, false)
+
+	if err == nil {
+		err = errorFromResponse(resp)
+	}
+
+	if err == nil {
+		var readObj struct{
+			Data json.RawMessage `json:"data"`
+		}
+
+		errUnmarshal := json.Unmarshal([]byte(resp), &readObj)
+		if errUnmarshal != nil {
+			return errUnmarshal
+		}
+
+		errUnmarshalObj := json.Unmarshal(readObj.Data, &obj)
+		if errUnmarshalObj != nil {
+			return errUnmarshalObj
+		}
+
 	}
 
 	return err

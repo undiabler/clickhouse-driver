@@ -44,6 +44,59 @@ if err == nil {
 }
 ```
 
+#### Auth and multiple insert
+```go
+conn := clickhouse.NewConn("localhost:8123", clickhouse.NewHttpTransport())
+conn.AddParam("user", "{username}")
+conn.AddParam("password", "{password}")
+
+queryStr := `INSERT INTO clicks FORMAT TabSeparated
+1	2017-09-27	10
+2	2017-09-27	11
+3	2017-09-27	12`
+
+query := clickhouse.NewQuery(queryStr)
+iter := query.Iter(conn)
+
+if iter.Error() != nil {
+    //
+}
+```
+
+#### Fetch rows
+```go
+conn := clickhouse.NewConn("localhost:8123", clickhouse.NewHttpTransport())
+
+queryStr := `SELECT visit_id, visit_number FROM clicks ORDER BY created_at DESC LIMIT 5`
+query := clickhouse.NewQuery(queryStr)
+
+type fetch struct {
+    VisitId     string  `json:"visit_id"`
+    VisitNumber int     `json:"visit_number"`
+}
+fetchObj := []fetch{}
+
+err := query.ExecScan(dbConnection, &fetchObj)
+
+if err != nil {
+    //
+}
+
+/**
+([]fetch)
+  0(fetch)
+    VisitId(string) "ufifgdwp0y0wfiqp-7887"
+    VisitNumber(int) 1
+  1(fetch)
+    VisitId(string) "ufifgdwp0y0wfiww-5356"
+    VisitNumber(int) 1
+  2(fetch)
+    VisitId(string) "ufifgdwp0y0wfiwt-408"
+    VisitNumber(int) 2
+...
+*/
+```
+
 #### External data for query processing
 
 [See documentation for details](https://clickhouse.yandex/reference_en.html#External%20data%20for%20query%20processing) 
