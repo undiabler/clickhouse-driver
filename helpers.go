@@ -2,19 +2,19 @@ package clickhouse
 
 import (
 	"errors"
-	"strings"
 	"fmt"
 	"net/url"
+	"strings"
 )
 
 type (
-	Column  string
-	Columns []string
-	Row     []interface{}
-	Rows    []Row
-	Array   []interface{}
+	Column            string
+	Columns           []string
+	Row               []interface{}
+	Rows              []Row
+	Array             []interface{}
 	VisitParamsString map[string]interface{}
-	StringArray []string
+	StringArray       []string
 )
 
 func NewHttpTransport() HttpTransport {
@@ -30,15 +30,22 @@ func NewConn(host string, t Transport) *Conn {
 	return &Conn{
 		Host:      host,
 		transport: t,
-		params: url.Values{},
+		params:    url.Values{},
 	}
+}
+
+func NewAuthConn(host string, t Transport, user, pass string) *Conn {
+	conn := NewConn(host, t)
+	conn.AddParam("user", user)
+	conn.AddParam("password", pass)
+	return conn
 }
 
 func NewQuery(stmt string, args ...interface{}) Query {
 	return Query{
-		Stmt: stmt,
-		args: args,
-		params:url.Values{},
+		Stmt:   stmt,
+		args:   args,
+		params: url.Values{},
 	}
 }
 
