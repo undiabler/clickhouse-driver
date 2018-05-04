@@ -1,9 +1,10 @@
 package clickhouse
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func BenchmarkMarshalString(b *testing.B) {

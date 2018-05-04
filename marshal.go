@@ -1,12 +1,12 @@
 package clickhouse
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"strconv"
 	"strings"
 	"time"
-	"encoding/json"
 )
 
 func escape(s string) string {
@@ -220,8 +220,8 @@ func marshal(value interface{}) string {
 	case string:
 		return fmt.Sprintf("'%s'", escape(v))
 	case int, int8, int16, int32, int64,
-	uint, uint8, uint16, uint32, uint64,
-	float32, float64:
+		uint, uint8, uint16, uint32, uint64,
+		float32, float64:
 		return fmt.Sprintf("%v", v)
 	//https://clickhouse.yandex/reference_en.html#Boolean values
 	case bool:
