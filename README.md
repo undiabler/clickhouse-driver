@@ -1,6 +1,7 @@
-# go-clickhouse 
+# clickhouse-driver
+# [![Travis status](https://img.shields.io/travis/undiabler/clickhouse-driver.svg)](https://travis-ci.org/undiabler/clickhouse-driver) [![Coverage Status](https://img.shields.io/coveralls/undiabler/clickhouse-driver.svg)](https://coveralls.io/github/undiabler/clickhouse-driver) [![Go Report](https://goreportcard.com/badge/github.com/undiabler/clickhouse-driver)](https://goreportcard.com/report/github.com/undiabler/clickhouse-driver) ![](https://img.shields.io/github/license/undiabler/clickhouse-driver.svg)
 
-Golang [Yandex ClickHouse](https://clickhouse.yandex/) HTTP connector
+Golang [Yandex ClickHouse](https://clickhouse.yandex/) HTTP driver
 
 ClickHouse manages extremely large volumes of data in a stable and sustainable manner.
 It currently powers Yandex.Metrica, world’s second largest web analytics platform,
