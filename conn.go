@@ -49,7 +49,7 @@ func (c *Conn) Ping() (err error) {
 }
 
 func (c *Conn) Exec(q Query, readOnly bool) (res string, err error) {
-	return c.transport.Exec(c.Host, c.params.Encode(), q, readOnly)
+	return c.transport.Exec(c.GetHost(), c.GetParams().Encode(), q, readOnly)
 }
 
 func (c *Conn) SetParams(params url.Values) {
@@ -62,4 +62,8 @@ func (c *Conn) AddParam(key string, value string) {
 
 func (c *Conn) GetParams() url.Values {
 	return c.params
+}
+
+func (c *Conn) GetHost() string {
+	return c.Host
 }
