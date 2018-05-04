@@ -2,11 +2,9 @@ package clickhouse
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/assert"
-	"io/ioutil"
 
-	"mime"
-	"mime/multipart"
+	"github.com/stretchr/testify/assert"
+
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -28,10 +26,10 @@ func TestExec(t *testing.T) {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
-	transport := HttpTransport{}
+	transport := NewHttpTransport()
 	conn := Conn{Host: server.URL, transport: transport}
 	q := NewQuery("SELECT * FROM testdata")
-	resp, err := transport.Exec(&conn, q, false)
+	resp, err := conn.Exec(q, false)
 	assert.Equal(t, nil, err)
 	assert.Equal(t, handler.Result, resp)
 
@@ -42,27 +40,26 @@ func TestExecReadOnly(t *testing.T) {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
-	transport := HttpTransport{}
+	transport := NewHttpTransport()
 	conn := Conn{Host: server.URL, transport: transport}
 	q := NewQuery(url.QueryEscape("SELECT * FROM testdata"))
 	query := prepareHttp(q.Stmt, q.args)
 	query = "?query=" + url.QueryEscape(query)
-	resp, err := transport.Exec(&conn, q, true)
+	resp, err := conn.Exec(q, true)
 	assert.Equal(t, nil, err)
 	assert.Equal(t, handler.Result, resp)
 
 }
 
 func TestPrepareHttp(t *testing.T) {
-	p := prepareHttp("SELECT * FROM table WHERE key = ?", []interface{}{"test"})
+	p := prepareHttp("SELECT * FROM table WHERE key = :value:", []interface{}{"test"})
 	assert.Equal(t, "SELECT * FROM table WHERE key = 'test'", p)
 }
 
 func TestPrepareHttpArray(t *testing.T) {
-	p := prepareHttp("INSERT INTO table (arr) VALUES (?)", Row{Array{"val1", "val2"}})
+	p := prepareHttp("INSERT INTO table (arr) VALUES (:value:)", Row{Array{"val1", "val2"}})
 	assert.Equal(t, "INSERT INTO table (arr) VALUES (['val1','val2'])", p)
 }
-
 
 func BenchmarkPrepareHttp(b *testing.B) {
 	params := strings.Repeat("(?,?,?,?,?,?,?,?)", 1000)

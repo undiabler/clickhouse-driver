@@ -1,12 +1,20 @@
 package clickhouse
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
+func active_host(conn *Conn) string {
+	if conn == nil {
+		return ""
+	}
+	return conn.Host
+}
+
 func TestPing(t *testing.T) {
-	goodTr := getMockTransport("Ok.")
+	goodTr := getMockTransport("1")
 	badTr := getMockTransport("Code: 9999, Error: ...")
 
 	conn1 := NewConn("host1", badTr)
@@ -24,7 +32,7 @@ func TestPing(t *testing.T) {
 
 	cl.Check()
 
-	assert.Equal(t, conn2.Host, cl.ActiveConn().Host)
+	assert.Equal(t, conn2.Host, active_host(cl.ActiveConn()))
 
 	assert.False(t, cl.IsDown())
 
@@ -37,7 +45,7 @@ func TestPing(t *testing.T) {
 
 	cl.Check()
 
-	assert.Equal(t, conn1.Host, cl.ActiveConn().Host)
+	assert.Equal(t, conn1.Host, active_host(cl.ActiveConn()))
 
 	cl.conn[0] = NewConn("host1", badTr)
 	cl.conn[1] = NewConn("host2", badTr)

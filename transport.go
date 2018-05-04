@@ -14,24 +14,34 @@ const (
 )
 
 type Transport interface {
-	Exec(conn *Conn, q Query, readOnly bool) (res string, err error)
+	Exec(host, params string, q Query, readOnly bool) (res string, err error)
 }
 
 type HttpTransport struct {
-	Timeout time.Duration
+	client *http.Client
 }
 
-func (t HttpTransport) Exec(conn *Conn, q Query, readOnly bool) (res string, err error) {
+func NewHttpTransport() HttpTransport {
+	default_client := &http.Client{
+		Timeout: 30 * time.Second,
+	}
+	return NewCustomTransport(default_client)
+}
+
+func NewCustomTransport(client *http.Client) HttpTransport {
+	return HttpTransport{
+		client: client,
+	}
+}
+
+func (t HttpTransport) Exec(host, params string, q Query, readOnly bool) (res string, err error) {
 	var resp *http.Response
 	query := prepareHttp(q.Stmt, q.args)
-	client := &http.Client{Timeout: t.Timeout}
 
 	if readOnly {
 		if len(query) > 0 {
 			query = "?query=" + query
 		}
-
-		params := conn.params.Encode()
 
 		if len(params) > 0 {
 			if len(query) > 0 {
@@ -41,18 +51,18 @@ func (t HttpTransport) Exec(conn *Conn, q Query, readOnly bool) (res string, err
 			}
 		}
 
-		resp, err = client.Get(conn.Host + query)
+		resp, err = t.client.Get(host + query)
 	} else {
 		var req *http.Request
 
 		// Set global parameters for query, like: user, password, max_memory_limit, etc.
 		// But it skips already defined params.
-		req, err = prepareExecPostRequest(conn, q)
+		req, err = prepareExecPostRequest(host, params, q)
 
 		if err != nil {
 			return "", err
 		}
-		resp, err = client.Do(req)
+		resp, err = t.client.Do(req)
 	}
 
 	if err != nil {
@@ -66,7 +76,7 @@ func (t HttpTransport) Exec(conn *Conn, q Query, readOnly bool) (res string, err
 	return buf.String(), err
 }
 
-func prepareExecPostRequest(conn *Conn, q Query) (*http.Request, error) {
+func prepareExecPostRequest(host, paramsCon string, q Query) (*http.Request, error) {
 	query := prepareHttp(q.Stmt, q.args)
 	var req *http.Request
 	var err error = nil
@@ -96,8 +106,6 @@ func prepareExecPostRequest(conn *Conn, q Query) (*http.Request, error) {
 			query += "&" + params
 		}
 
-		paramsCon := conn.params.Encode()
-
 		if len(paramsCon) > 0 {
 			query += "&" + paramsCon
 		}
@@ -107,13 +115,13 @@ func prepareExecPostRequest(conn *Conn, q Query) (*http.Request, error) {
 			return nil, err
 		}
 
-		req, err = http.NewRequest("POST", conn.Host + query, body)
+		req, err = http.NewRequest("POST", host+query, body)
 		if err != nil {
 			return nil, err
 		}
 		req.Header.Set("Content-Type", writer.FormDataContentType())
 	} else {
-		req, err = http.NewRequest("POST", conn.Host + "?" + conn.params.Encode(), strings.NewReader(query))
+		req, err = http.NewRequest("POST", host+"?"+paramsCon, strings.NewReader(query))
 		if err != nil {
 			return nil, err
 		}
@@ -126,7 +134,7 @@ func prepareHttp(stmt string, args []interface{}) string {
 	if len(args) == 0 {
 		return stmt
 	}
-	
+
 	var res []byte
 
 	buf := []byte(stmt)
@@ -145,7 +153,7 @@ func prepareHttp(stmt string, args []interface{}) string {
 			skip_to = -1
 		}
 
-		if ch == ':' && stmt[key:key + 7] == ":value:"  {
+		if ch == ':' && stmt[key:key+7] == ":value:" {
 			res = append(res, []byte(marshal(args[k]))...)
 			k++
 			skip_to = key + 7

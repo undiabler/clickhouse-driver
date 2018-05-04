@@ -2,8 +2,9 @@ package clickhouse
 
 import (
 	"errors"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 type mockTransport struct {
@@ -15,11 +16,11 @@ type badTransport struct {
 	err      error
 }
 
-func (m mockTransport) Exec(conn *Conn, q Query, readOnly bool) (r string, err error) {
+func (m mockTransport) Exec(host, params string, q Query, readOnly bool) (r string, err error) {
 	return m.response, nil
 }
 
-func (m badTransport) Exec(conn *Conn, q Query, readOnly bool) (r string, err error) {
+func (m badTransport) Exec(host, params string, q Query, readOnly bool) (r string, err error) {
 	return "", m.err
 }
 

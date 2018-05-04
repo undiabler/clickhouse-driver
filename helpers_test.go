@@ -1,8 +1,9 @@
 package clickhouse
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNewHttpTransport(t *testing.T) {
@@ -24,7 +25,7 @@ func TestBuildInsert(t *testing.T) {
 	)
 
 	q, err = BuildInsert("test", Columns{"col1", "col2"}, Row{"val1", "val2"})
-	assert.Equal(t, "INSERT INTO test (col1,col2) VALUES (?,?)", q.Stmt)
+	assert.Equal(t, "INSERT INTO test (col1,col2) VALUES (:value:,:value:)", q.Stmt)
 	assert.Equal(t, []interface{}{"val1", "val2"}, q.args)
 	assert.NoError(t, err)
 
@@ -40,7 +41,7 @@ func TestBuildInsertArray(t *testing.T) {
 	)
 
 	q, err = BuildInsert("test", Columns{"col1", "col2"}, Row{"val1", Array{"val2", "val3"}})
-	assert.Equal(t, "INSERT INTO test (col1,col2) VALUES (?,?)", q.Stmt)
+	assert.Equal(t, "INSERT INTO test (col1,col2) VALUES (:value:,:value:)", q.Stmt)
 	assert.Equal(t, []interface{}{"val1", Array{"val2", "val3"}}, q.args)
 	assert.NoError(t, err)
 }
@@ -55,7 +56,7 @@ func TestNewMultiInsert(t *testing.T) {
 		Row{"val1", "val2"},
 		Row{"val3", "val4"},
 	})
-	assert.Equal(t, "INSERT INTO test (col1,col2) VALUES (?,?),(?,?)", q.Stmt)
+	assert.Equal(t, "INSERT INTO test (col1,col2) VALUES (:value:,:value:),(:value:,:value:)", q.Stmt)
 	assert.Equal(t, []interface{}{"val1", "val2", "val3", "val4"}, q.args)
 	assert.NoError(t, err)
 

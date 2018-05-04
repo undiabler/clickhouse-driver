@@ -1,10 +1,10 @@
 package clickhouse
 
 import (
-	"errors"
-	"strings"
-	"net/url"
 	"encoding/json"
+	"errors"
+	"net/url"
+	"strings"
 )
 
 type External struct {
@@ -22,7 +22,11 @@ type Query struct {
 	Stmt      string
 	args      []interface{}
 	externals []External
-	params url.Values
+	params    url.Values
+}
+
+type ConnType interface {
+	Exec(q Query, readOnly bool) (res string, err error)
 }
 
 // Adding external dictionary
@@ -47,7 +51,7 @@ func (q Query) Iter(conn *Conn) *Iter {
 	if conn == nil {
 		return &Iter{err: errors.New("Connection pointer is nil")}
 	}
-	resp, err := conn.transport.Exec(conn, q, false)
+	resp, err := conn.Exec(q, false)
 	if err != nil {
 		return &Iter{err: err}
 	}
@@ -68,7 +72,7 @@ func (q Query) Exec(conn *Conn) (err error) {
 	if conn == nil {
 		return errors.New("Connection pointer is nil")
 	}
-	resp, err := conn.transport.Exec(conn, q, false)
+	resp, err := conn.Exec(q, false)
 	if err == nil {
 		err = errorFromResponse(resp)
 	}
@@ -76,21 +80,21 @@ func (q Query) Exec(conn *Conn) (err error) {
 	return err
 }
 
-func (q Query) ExecScan(conn *Conn, obj interface{}) (error) {
+func (q Query) ExecScan(conn *Conn, obj interface{}) error {
 	if conn == nil {
 		return errors.New("Connection pointer is nil")
 	}
 
 	q.Stmt += " FORMAT JSON"
 
-	resp, err := conn.transport.Exec(conn, q, false)
+	resp, err := conn.Exec(q, false)
 
 	if err == nil {
 		err = errorFromResponse(resp)
 	}
 
 	if err == nil {
-		var readObj struct{
+		var readObj struct {
 			Data json.RawMessage `json:"data"`
 		}
 

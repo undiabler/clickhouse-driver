@@ -2,13 +2,14 @@ package clickhouse
 
 import (
 	"errors"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestConnect(t *testing.T) {
 	var conn *Conn
-	tr := getMockTransport("Ok.")
+	tr := getMockTransport("1")
 
 	conn = NewConn("host.local", tr)
 	assert.Equal(t, "http://host.local/", conn.Host)
@@ -24,7 +25,7 @@ func TestConnect(t *testing.T) {
 }
 
 func TestConn_Ping(t *testing.T) {
-	tr := getMockTransport("Ok.")
+	tr := getMockTransport("1")
 	conn := NewConn("host.local", tr)
 	assert.NoError(t, conn.Ping())
 }

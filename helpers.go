@@ -17,30 +17,6 @@ type (
 	StringArray       []string
 )
 
-func NewHttpTransport() HttpTransport {
-	return HttpTransport{}
-}
-
-func NewConn(host string, t Transport) *Conn {
-	if strings.Index(host, "http://") < 0 && strings.Index(host, "https://") < 0 {
-		host = "http://" + host
-	}
-	host = strings.TrimRight(host, "/") + "/"
-
-	return &Conn{
-		Host:      host,
-		transport: t,
-		params:    url.Values{},
-	}
-}
-
-func NewAuthConn(host string, t Transport, user, pass string) *Conn {
-	conn := NewConn(host, t)
-	conn.AddParam("user", user)
-	conn.AddParam("password", pass)
-	return conn
-}
-
 func NewQuery(stmt string, args ...interface{}) Query {
 	return Query{
 		Stmt:   stmt,
