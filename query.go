@@ -25,7 +25,7 @@ type Query struct {
 	params    url.Values
 }
 
-type ConnType interface {
+type Connector interface {
 	Exec(q Query, readOnly bool) (res string, err error)
 }
 
@@ -47,7 +47,7 @@ func (q Query) MergeParams(params url.Values) {
 	}
 }
 
-func (q Query) Iter(conn *Conn) *Iter {
+func (q Query) Iter(conn Connector) *Iter {
 	if conn == nil {
 		return &Iter{err: errors.New("Connection pointer is nil")}
 	}
@@ -68,7 +68,7 @@ func (r *Iter) Len() int {
 	return len(r.text)
 }
 
-func (q Query) Exec(conn *Conn) (err error) {
+func (q Query) Exec(conn Connector) (err error) {
 	if conn == nil {
 		return errors.New("Connection pointer is nil")
 	}
@@ -80,7 +80,7 @@ func (q Query) Exec(conn *Conn) (err error) {
 	return err
 }
 
-func (q Query) ExecScan(conn *Conn, obj interface{}) error {
+func (q Query) ExecScan(conn Connector, obj interface{}) error {
 	if conn == nil {
 		return errors.New("Connection pointer is nil")
 	}
