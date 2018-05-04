@@ -27,6 +27,7 @@ type Query struct {
 
 type Connector interface {
 	Exec(q Query, readOnly bool) (res string, err error)
+	GetHost() string
 }
 
 // Adding external dictionary
