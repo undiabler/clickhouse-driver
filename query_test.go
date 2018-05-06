@@ -2,6 +2,7 @@ package clickhouse
 
 import (
 	"errors"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -14,6 +15,19 @@ type mockTransport struct {
 type badTransport struct {
 	response string
 	err      error
+}
+
+type authTransport struct {
+	response string
+}
+
+func (m authTransport) Exec(host, params string, q Query, readOnly bool) (r string, err error) {
+	if strings.Contains(params, "user=user") && strings.Contains(params, "password=pass") {
+		return m.response, nil
+	} else {
+		// TODO: pass real auth error
+		return "", errors.New("Auth error")
+	}
 }
 
 func (m mockTransport) Exec(host, params string, q Query, readOnly bool) (r string, err error) {

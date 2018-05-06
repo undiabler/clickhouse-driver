@@ -42,3 +42,15 @@ func TestConn_Ping3(t *testing.T) {
 	assert.Error(t, conn.Ping())
 	assert.Equal(t, "Connection timeout", conn.Ping().Error())
 }
+
+func TestAuthConn(t *testing.T) {
+
+	tr := authTransport{response: "1"}
+
+	conn := NewConn("host.local", tr)
+	assert.Error(t, conn.Ping())
+
+	conn = NewAuthConn("host.local", tr, "user", "pass")
+	assert.NoError(t, conn.Ping())
+
+}
