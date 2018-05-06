@@ -15,20 +15,21 @@ func BenchmarkMarshalString(b *testing.B) {
 
 func TestUnmarshal(t *testing.T) {
 	var (
-		err            error
-		valInt         int
-		valInt8        int8
-		valInt16       int16
-		valInt32       int32
-		valInt64       int64
-		valString      string
-		valTime        time.Time
-		valUnsupported testing.T
-		valFloat32     float32
-		valFloat64     float64
-		valArrayString []string
-		valArrayInt    []int
-		valArray       Array
+		err             error
+		valInt          int
+		valInt8         int8
+		valInt16        int16
+		valInt32        int32
+		valInt64        int64
+		valString       string
+		valTime         time.Time
+		valUnsupported  testing.T
+		valFloat32      float32
+		valFloat64      float64
+		valArrayString  []string
+		valArrayInt     []int
+		valArrayFloat32 []float32
+		valArray        Array
 	)
 
 	err = unmarshal(&valInt, "10")
@@ -89,11 +90,15 @@ func TestUnmarshal(t *testing.T) {
 	assert.Equal(t, []int{10, 20}, valArrayInt)
 	assert.NoError(t, err)
 
+	err = unmarshal(&valArrayInt, "[10,20]")
+	assert.Equal(t, []int{10, 20}, valArrayInt)
+	assert.NoError(t, err)
+
 	err = unmarshal(&valArrayInt, "")
 	assert.Error(t, err, "Column data is not of type []int")
 
-	err = unmarshal(&valArrayInt, "[]")
-	assert.Equal(t, []int{}, valArrayInt)
+	err = unmarshal(&valArrayFloat32, "[3.141592]")
+	assert.Equal(t, []float32{3.141592}, valArrayFloat32)
 	assert.NoError(t, err)
 
 	err = unmarshal(&valArray, "['k10','20']")
