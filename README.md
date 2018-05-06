@@ -1,5 +1,10 @@
+[![Travis status](https://img.shields.io/travis/undiabler/clickhouse-driver.svg)](https://travis-ci.org/undiabler/clickhouse-driver) 
+[![GoDoc](https://godoc.org/github.com/undiabler/clickhouse-driver?status.svg)](https://godoc.org/github.com/undiabler/clickhouse-driver)
+[![Go Report](https://goreportcard.com/badge/github.com/undiabler/clickhouse-driver)](https://goreportcard.com/report/github.com/undiabler/clickhouse-driver) 
+[![Coverage Status](https://img.shields.io/coveralls/undiabler/clickhouse-driver.svg)](https://coveralls.io/github/undiabler/clickhouse-driver) 
+![](https://img.shields.io/github/license/undiabler/clickhouse-driver.svg)
+
 # clickhouse-driver
-# [![Travis status](https://img.shields.io/travis/undiabler/clickhouse-driver.svg)](https://travis-ci.org/undiabler/clickhouse-driver) [![Coverage Status](https://img.shields.io/coveralls/undiabler/clickhouse-driver.svg)](https://coveralls.io/github/undiabler/clickhouse-driver) [![Go Report](https://goreportcard.com/badge/github.com/undiabler/clickhouse-driver)](https://goreportcard.com/report/github.com/undiabler/clickhouse-driver) ![](https://img.shields.io/github/license/undiabler/clickhouse-driver.svg)
 
 Golang [Yandex ClickHouse](https://clickhouse.yandex/) HTTP driver
 
