@@ -17,6 +17,7 @@ type (
 	StringArray       []string
 )
 
+// NewQuery creates new query from query string and args
 func NewQuery(stmt string, args ...interface{}) Query {
 	return Query{
 		Stmt:   stmt,
@@ -25,10 +26,12 @@ func NewQuery(stmt string, args ...interface{}) Query {
 	}
 }
 
+// OptimizeTable create new optimization query. For more info read https://clickhouse.yandex/docs/en/query_language/queries/#optimize
 func OptimizeTable(table string) Query {
 	return NewQuery("OPTIMIZE TABLE " + table)
 }
 
+// OptimizeTable create new optimization table for specific partition
 func OptimizePartition(table string, partition string) Query {
 	return NewQuery("OPTIMIZE TABLE " + table + " PARTITION " + partition + " FINAL")
 }
@@ -64,10 +67,12 @@ func IsLeader(table string, conn *Conn) bool {
 	return false
 }
 
+// BuildInsert create new query from columns and one row
 func BuildInsert(tbl string, cols Columns, row Row) (Query, error) {
 	return BuildMultiInsert(tbl, cols, Rows{row})
 }
 
+// BuildMultiInsert create new bulk query from columns and rows
 func BuildMultiInsert(tbl string, cols Columns, rows Rows) (Query, error) {
 	var (
 		stmt string
