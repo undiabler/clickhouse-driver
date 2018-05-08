@@ -25,6 +25,7 @@ type Query struct {
 	params    url.Values
 }
 
+// Connector interface, all query funcs take this interface, so you can replace it by connections from other libs
 type Connector interface {
 	Exec(q Query, readOnly bool) (res string, err error)
 	GetHost() string
@@ -35,7 +36,8 @@ func (q *Query) AddExternal(name string, structure string, data []byte) {
 	q.externals = append(q.externals, External{Name: name, Structure: structure, Data: data})
 }
 
-// Additional parameters like: max_memory_usage, etc.
+// AddParam parameters for one query like: max_memory_usage, etc.
+// if you want this params to be permanent you should pass them to Conn struct
 func (q Query) AddParam(name string, value string) {
 	q.params.Add(name, value)
 }
@@ -48,6 +50,7 @@ func (q Query) MergeParams(params url.Values) {
 	}
 }
 
+// Iterate over records. Note that it isnt real DB iterator while Clickhouse dont support them. All responce is stored in memory. Iterator just return them step by step.
 func (q Query) Iter(conn Connector) *Iter {
 	if conn == nil {
 		return &Iter{err: errors.New("Connection pointer is nil")}
@@ -81,6 +84,7 @@ func (q Query) Exec(conn Connector) (err error) {
 	return err
 }
 
+// ExecScan make request in JSON format and unmarshall result into obj
 func (q Query) ExecScan(conn Connector, obj interface{}) error {
 	if conn == nil {
 		return errors.New("Connection pointer is nil")
