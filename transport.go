@@ -13,14 +13,19 @@ const (
 	httpTransportBodyType = "text/plain"
 )
 
+// Transport interface, Conn store this interface inside.
+//
+// query.Exec -> conn.Exec -> transport.Exec -> Clickhouse Http
 type Transport interface {
 	Exec(host, params string, q Query, readOnly bool) (res string, err error)
 }
 
+// HttpTransport use http.Client for connections
 type HttpTransport struct {
 	client *http.Client
 }
 
+// NewHttpTransport creates default http transport with 30sec timeout
 func NewHttpTransport() HttpTransport {
 	default_client := &http.Client{
 		Timeout: 30 * time.Second,
@@ -28,12 +33,14 @@ func NewHttpTransport() HttpTransport {
 	return NewCustomTransport(default_client)
 }
 
+// NewCustomTransport creates HttpTransport with custom client. Usefull for special timeouts, tls config etc.
 func NewCustomTransport(client *http.Client) HttpTransport {
 	return HttpTransport{
 		client: client,
 	}
 }
 
+// Exec make http request with all params. readOnly param controls GET/POST request
 func (t HttpTransport) Exec(host, params string, q Query, readOnly bool) (res string, err error) {
 	var resp *http.Response
 	query := prepareHttp(q.Stmt, q.args)
