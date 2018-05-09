@@ -17,10 +17,17 @@ successfully implemented at CERN’s LHCb experiment to store and process metada
 
 ## Examples
 
-#### Query rows
-
+#### Creating connection
 ```go
+// simple connection
 conn := clickhouse.NewConn("localhost:8123", clickhouse.NewHttpTransport())
+
+// connection with auth
+conn := clickhouse.NewAuthConn("localhost:8123", clickhouse.NewHttpTransport(),"username","password")
+```
+
+#### Query rows
+```go
 query := clickhouse.NewQuery("SELECT name, date FROM clicks")
 iter := query.Iter(conn)
 var (
@@ -37,7 +44,6 @@ if iter.Error() != nil {
 
 #### Single insert
 ```go
-conn := clickhouse.NewConn("localhost:8123", clickhouse.NewHttpTransport())
 query, err := clickhouse.BuildInsert("clicks",
     clickhouse.Columns{"name", "date", "sourceip"},
     clickhouse.Row{"Test name", "2016-01-01 21:01:01", clickhouse.Func{"IPv4StringToNum", "192.0.2.192"}},
@@ -50,12 +56,8 @@ if err == nil {
 }
 ```
 
-#### Auth and multiple insert
+#### Multiple insert
 ```go
-conn := clickhouse.NewConn("localhost:8123", clickhouse.NewHttpTransport())
-conn.AddParam("user", "{username}")
-conn.AddParam("password", "{password}")
-
 queryStr := `INSERT INTO clicks FORMAT TabSeparated
 1	2017-09-27	10
 2	2017-09-27	11
@@ -68,11 +70,10 @@ if iter.Error() != nil {
     //
 }
 ```
+For more efficient writing see [batching library](https://github.com/undiabler/yadb).
 
 #### Fetch rows
 ```go
-conn := clickhouse.NewConn("localhost:8123", clickhouse.NewHttpTransport())
-
 queryStr := `SELECT visit_id, visit_number FROM clicks ORDER BY created_at DESC LIMIT 5`
 query := clickhouse.NewQuery(queryStr)
 
@@ -82,7 +83,7 @@ type fetch struct {
 }
 fetchObj := []fetch{}
 
-err := query.ExecScan(dbConnection, &fetchObj)
+err := query.ExecScan(conn, &fetchObj)
 
 if err != nil {
     //
@@ -104,11 +105,8 @@ if err != nil {
 ```
 
 #### External data for query processing
-
 [See documentation for details](https://clickhouse.yandex/reference_en.html#External%20data%20for%20query%20processing) 
-
 ```go
-conn := clickhouse.NewConn("localhost:8123", clickhouse.NewHttpTransport())
 query := clickhouse.NewQuery("SELECT Num, Name FROM extdata")
 query.AddExternal("extdata", "Num UInt32, Name String", []byte("1	first\n2	second")) // tab separated
 
@@ -126,7 +124,22 @@ if iter.Error() != nil {
 }
 ```
 
-## Cluster
+#### Custom transport options
+```go
+var someClient = &http.Client{
+    Timeout: time.Second * 10,
+    Transport: &http.Transport{
+        Dial: (&net.Dialer{
+            Timeout: 5 * time.Second,
+        }).Dial,
+        TLSHandshakeTimeout: 5 * time.Second,
+    },
+}
+
+t := clickhouse.NewCustomTransport(someClient)
+```
+
+## Clustering
 
 Cluster is useful if you have several servers with same `Distributed` table (master). In this case you can send
 requests to random master to balance load.
@@ -156,13 +169,9 @@ go func() {
 }()
 ```
 
-## Transport options
+## Other libs
 
-### Timeout
-
-```go
-t := clickhouse.NewHttpTransport()
-t.Timeout = time.Second * 5
-
-conn := clickhouse.NewConn("host", t)
-```
+- [clickhouse](https://github.com/kshvakov/clickhouse/)
+- [go-clickhouse](https://github.com/roistat/go-clickhouse)
+- [mailrugo-clickhouse](https://github.com/mailru/go-clickhouse)
+- [golang-clickhouse](https://github.com/leprosus/golang-clickhouse)
