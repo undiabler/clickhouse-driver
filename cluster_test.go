@@ -13,7 +13,7 @@ func active_host(conn *Conn) string {
 	return conn.Host
 }
 
-func TestPing(t *testing.T) {
+func TestPartialCluster(t *testing.T) {
 	goodTr := getMockTransport("1")
 	badTr := getMockTransport("Code: 9999, Error: ...")
 
@@ -21,8 +21,8 @@ func TestPing(t *testing.T) {
 	conn2 := NewConn("host2", goodTr)
 
 	cl := NewCluster(conn1, conn2)
-	assert.Equal(t, conn1, cl.conn[0])
-	assert.Equal(t, conn2, cl.conn[1])
+	// assert.Equal(t, conn1, cl.conn[0])
+	// assert.Equal(t, conn2, cl.conn[1])
 
 	assert.True(t, cl.IsDown())
 
@@ -36,24 +36,18 @@ func TestPing(t *testing.T) {
 
 	assert.False(t, cl.IsDown())
 
-	cl.conn[0] = NewConn("host1", goodTr)
-	cl.conn[1] = NewConn("host2", badTr)
+}
 
-	cl.OnCheckError(func(c *Conn) {
-		assert.Equal(t, conn2.Host, c.Host)
-	})
+func TestFailedCluster(t *testing.T) {
+
+	badTr := getMockTransport("Code: 9999, Error: ...")
+
+	conn1 := NewConn("host1", badTr)
+	conn2 := NewConn("host2", badTr)
+
+	cl := NewCluster(conn1, conn2)
 
 	cl.Check()
-
-	assert.Equal(t, conn1.Host, active_host(cl.ActiveConn()))
-
-	cl.conn[0] = NewConn("host1", badTr)
-	cl.conn[1] = NewConn("host2", badTr)
-
-	cl.OnCheckError(func(c *Conn) {})
-	cl.Check()
-
 	assert.Nil(t, cl.ActiveConn())
-
 	assert.True(t, cl.IsDown())
 }
