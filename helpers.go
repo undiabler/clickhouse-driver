@@ -8,9 +8,13 @@ import (
 )
 
 type (
-	Column            string
-	Columns           []string
-	Row               []interface{}
+	// Column name
+	Column string
+	// Columns array, order is important
+	Columns []string
+	// Row value
+	Row []interface{}
+	// Rows array or values
 	Rows              []Row
 	Array             []interface{}
 	VisitParamsString map[string]interface{}
