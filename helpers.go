@@ -26,47 +26,6 @@ func NewQuery(stmt string, args ...interface{}) Query {
 	}
 }
 
-// OptimizeTable create new optimization query. For more info read https://clickhouse.yandex/docs/en/query_language/queries/#optimize
-func OptimizeTable(table string) Query {
-	return NewQuery("OPTIMIZE TABLE " + table)
-}
-
-// OptimizeTable create new optimization table for specific partition
-func OptimizePartition(table string, partition string) Query {
-	return NewQuery("OPTIMIZE TABLE " + table + " PARTITION " + partition + " FINAL")
-}
-
-func IsLeader(table string, conn *Conn) bool {
-
-	var leader uint8
-
-	settings := strings.Split(table, ".")
-
-	database := "default"
-
-	if len(settings) > 1 {
-
-		database = settings[0]
-
-		table = settings[1]
-
-	}
-
-	query := NewQuery("SELECT is_leader FROM system.replicas WHERE database = '" + database + "' table = '" + table + "'")
-
-	iter := query.Iter(conn)
-
-	if iter.Error() != nil {
-		return false
-	}
-
-	for iter.Scan(&leader) {
-		return leader == 1
-	}
-
-	return false
-}
-
 // BuildInsert create new query from columns and one row
 func BuildInsert(tbl string, cols Columns, row Row) (Query, error) {
 	return BuildMultiInsert(tbl, cols, Rows{row})
