@@ -84,6 +84,8 @@ func (c *Cluster) ActiveConn() *Conn {
 	return c.active[rand.Intn(l)]
 }
 
+// TODO: func with hosts speed for info messages
+
 // BestConn return fastest connection
 func (c *Cluster) BestConn() *Conn {
 
