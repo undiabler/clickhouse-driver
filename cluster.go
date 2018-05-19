@@ -30,6 +30,12 @@ func (p *pingStats) NewCheck(last int64, err bool) {
 	p.count += 1
 }
 
+func (p *pingStats) Avg() float64 {
+	p.mx.Lock()
+	defer p.mx.Unlock()
+	return p.avg
+}
+
 type PingErrorFunc func(*Conn)
 
 // Cluster is useful if you have several DBs with distributed or partitional logic. In this case you can send requests to random server to load balance and improve stability.
@@ -68,8 +74,6 @@ func (c *Cluster) OnCheckError(f PingErrorFunc) {
 }
 
 // ActiveConn return random active connection
-//
-// TODO: same func for best conn speed
 func (c *Cluster) ActiveConn() *Conn {
 	c.mx.Lock()
 	defer c.mx.Unlock()
@@ -78,6 +82,34 @@ func (c *Cluster) ActiveConn() *Conn {
 		return nil
 	}
 	return c.active[rand.Intn(l)]
+}
+
+// BestConn return fastest connection
+func (c *Cluster) BestConn() *Conn {
+
+	c.mx.Lock()
+	defer c.mx.Unlock()
+
+	l := len(c.active)
+	if l < 1 {
+		return nil
+	}
+	if l == 1 {
+		return c.active[0]
+	}
+
+	max_v := c.conn[c.active[0]].Avg()
+	max_k := c.active[0]
+
+	for i := range c.active {
+		tmp := c.conn[c.active[i]].Avg()
+		if tmp < max_v {
+			max_v = tmp
+			max_k = c.active[i]
+		}
+	}
+
+	return max_k
 }
 
 // Check call Ping for all connections and save active
