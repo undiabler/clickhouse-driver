@@ -146,6 +146,7 @@ requests to random master to balance load.
 
 * `cluster.Check()` pings all connections and filters active ones
 * `cluster.ActiveConn()` returns random active connection
+* `cluster.BestConn()` returns fastest active connection
 * `cluster.OnCheckError()` is called when any connection fails
 
 **Important**: You should call method `Check()` at least once after initialization, but we recommend
