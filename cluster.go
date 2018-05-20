@@ -27,7 +27,7 @@ func (p *pingStats) NewCheck(last int64, err bool) {
 	} else {
 		p.avg = (p.avg*float64(p.count) + float64(last)) / (float64(p.count) + 1)
 	}
-	p.count += 1
+	p.count++
 }
 
 func (p *pingStats) Avg() float64 {
@@ -36,6 +36,7 @@ func (p *pingStats) Avg() float64 {
 	return p.avg
 }
 
+// PingErrorFunc callback function, call whenever ping failed
 type PingErrorFunc func(*Conn)
 
 // Cluster is useful if you have several DBs with distributed or partitional logic. In this case you can send requests to random server to load balance and improve stability.
@@ -100,18 +101,18 @@ func (c *Cluster) BestConn() *Conn {
 		return c.active[0]
 	}
 
-	max_v := c.conn[c.active[0]].Avg()
-	max_k := c.active[0]
+	maxV := c.conn[c.active[0]].Avg()
+	maxK := c.active[0]
 
 	for i := range c.active {
 		tmp := c.conn[c.active[i]].Avg()
-		if tmp < max_v {
-			max_v = tmp
-			max_k = c.active[i]
+		if tmp < maxV {
+			maxV = tmp
+			maxK = c.active[i]
 		}
 	}
 
-	return max_k
+	return maxK
 }
 
 // Check call Ping for all connections and save active
