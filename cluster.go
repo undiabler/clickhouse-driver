@@ -11,7 +11,7 @@ type pingStats struct {
 	count  int
 	errors int
 	last   int64
-	avg    float64
+	avg    int64
 }
 
 func (p *pingStats) NewCheck(last int64, err bool) {
@@ -23,14 +23,14 @@ func (p *pingStats) NewCheck(last int64, err bool) {
 	}
 	p.last = last
 	if p.count == 0 {
-		p.avg = float64(last)
+		p.avg = last
 	} else {
-		p.avg = (p.avg*float64(p.count) + float64(last)) / (float64(p.count) + 1)
+		p.avg = int64((float64(p.avg)*float64(p.count) + float64(last)) / (float64(p.count) + 1))
 	}
 	p.count++
 }
 
-func (p *pingStats) Avg() float64 {
+func (p *pingStats) Avg() int64 {
 	p.mx.Lock()
 	defer p.mx.Unlock()
 	return p.avg
