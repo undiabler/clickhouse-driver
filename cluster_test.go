@@ -47,7 +47,15 @@ func TestFailedCluster(t *testing.T) {
 
 	cl := NewCluster(conn1, conn2)
 
+	downCall := 0
+	cl.OnClusterDown(func() {
+		downCall++
+	})
+
 	cl.Check()
+
+	assert.Equal(t, 1, downCall)
+
 	assert.Nil(t, cl.ActiveConn())
 	assert.True(t, cl.IsDown())
 }
