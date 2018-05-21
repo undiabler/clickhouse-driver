@@ -1,19 +1,20 @@
+# clickhouse-driver
+
 [![Travis status](https://img.shields.io/travis/undiabler/clickhouse-driver.svg)](https://travis-ci.org/undiabler/clickhouse-driver) 
 [![GoDoc](https://godoc.org/github.com/undiabler/clickhouse-driver?status.svg)](https://godoc.org/github.com/undiabler/clickhouse-driver)
 [![Go Report](https://goreportcard.com/badge/github.com/undiabler/clickhouse-driver)](https://goreportcard.com/report/github.com/undiabler/clickhouse-driver) 
 [![Coverage Status](https://img.shields.io/coveralls/undiabler/clickhouse-driver.svg)](https://coveralls.io/github/undiabler/clickhouse-driver) 
 ![](https://img.shields.io/github/license/undiabler/clickhouse-driver.svg)
 
-# clickhouse-driver
-
-Golang [Yandex ClickHouse](https://clickhouse.yandex/) HTTP driver
-
-ClickHouse manages extremely large volumes of data in a stable and sustainable manner.
+Golang driver for [ClickHouse](https://clickhouse.yandex/) - column oriented DB that manages extremely large volumes of data in a stable and sustainable manner.
 It currently powers Yandex.Metrica, world’s second largest web analytics platform,
 with over 13 trillion database records and over 20 billion events a day, generating
-customized reports on-the-fly, directly from non-aggregated data. This system was
-successfully implemented at CERN’s LHCb experiment to store and process metadata on
-10bn events with over 1000 attributes per event registered in 2011.
+customized reports on-the-fly, directly from non-aggregated data. 
+
+## About
+
+Months of developing extra features for existing libs make me disappointed. 
+So I've decided to create clickhouse driver that will include everything not just for weekend projects but for real perfomance products too. 
 
 ## Examples
 
