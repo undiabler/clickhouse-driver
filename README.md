@@ -16,6 +16,14 @@ customized reports on-the-fly, directly from non-aggregated data.
 Months of developing extra features for existing libs make me disappointed. 
 So I've decided to create clickhouse driver that will include everything not just for weekend projects but for real perfomance products too. 
 
+## Features
+
+- clustering support
+- support auth connections
+- custom transport for ssl encrypted connections
+- go idiomatic interfaces
+- balancing connections in cluster
+
 ## Examples
 
 #### Creating connection
