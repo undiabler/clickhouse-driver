@@ -46,7 +46,8 @@ type Cluster struct {
 	mx     sync.Mutex
 	active []*Conn
 
-	fail PingErrorFunc
+	onFail PingErrorFunc
+	onDown func()
 }
 
 // NewCluster create cluster from connections
@@ -67,11 +68,14 @@ func (c *Cluster) IsDown() bool {
 	return len(c.active) < 1
 }
 
+// OnClusterDown callback func on all cluster is down
+func (c *Cluster) OnClusterDown(f func()) {
+	c.onDown = f
+}
+
 // OnCheckError callback func on each fail ping
-//
-// TODO: same func for all cluster down
 func (c *Cluster) OnCheckError(f PingErrorFunc) {
-	c.fail = f
+	c.onFail = f
 }
 
 // ActiveConn return random active connection
@@ -133,10 +137,17 @@ func (c *Cluster) Check() {
 		if err == nil {
 			res = append(res, conn)
 		} else {
-			if c.fail != nil {
-				c.fail(conn)
+			if c.onFail != nil {
+				c.onFail(conn)
 			}
 		}
+	}
+
+	if len(res) == 0 {
+		if c.onDown != nil {
+			c.onDown()
+		}
+		return
 	}
 
 	c.mx.Lock()
