@@ -88,7 +88,7 @@ func TestBestTransport(t *testing.T) {
 
 	mp := cl.RankConn()
 	t.Logf("ranks: %v", mp)
-	if mp[conn2] < mp[conn1] || mp[conn2] < mp[conn3] {
+	if mp[conn2] >= mp[conn1] || mp[conn2] >= mp[conn3] {
 		t.Error("Rank is corrupted")
 	}
 
