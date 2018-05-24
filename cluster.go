@@ -89,7 +89,14 @@ func (c *Cluster) ActiveConn() *Conn {
 	return c.active[rand.Intn(l)]
 }
 
-// TODO: func with hosts speed for info messages
+// RankConn return list of connections with avg speed, include also not working connections (if some last pings failed)
+func (c *Cluster) RankConn() map[*Conn]int64 {
+	rt := make(map[*Conn]int64)
+	for k, v := range c.conn {
+		rt[k] = v.Avg()
+	}
+	return rt
+}
 
 // BestConn return fastest connection
 func (c *Cluster) BestConn() *Conn {

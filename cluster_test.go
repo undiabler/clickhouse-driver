@@ -1,9 +1,10 @@
 package clickhouse
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func active_host(conn *Conn) string {
@@ -84,6 +85,12 @@ func TestBestTransport(t *testing.T) {
 	cl.Check()
 
 	assert.Equal(t, conn3.Host, active_host(cl.BestConn()))
+
+	mp := cl.RankConn()
+	t.Logf("ranks: %v", mp)
+	if mp[conn2] >= mp[conn1] || mp[conn2] >= mp[conn3] {
+		t.Error("Rank is corrupted")
+	}
 
 }
 
